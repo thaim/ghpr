@@ -7,4 +7,8 @@ program
 
 program.parse();
 
-console.log("hello");
+const main = () => {
+    console.log("hello");
+}
+
+main()
