@@ -1,4 +1,7 @@
 const { Command } = require("commander");
+const { Octokit } = require("@octokit/rest");
+import { Endpoints } from "@octokit/types";
+
 const program = new Command();
 
 program
@@ -14,6 +17,23 @@ const main = async (user: string, repo: string) => {
     const octokit = new Octokit();
 
     console.log(`Hello from main --user ${user} --repo ${repo}`);
+
+    type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
+    type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
+    const params: listPullRequestParameters = {
+        owner: user,
+        repo: repo,
+    };
+    const response: listPullRequestResponse = await octokit.request(
+        "GET /repos/{owner}/{repo}/pulls",
+        params
+    );
+
+    response.data.forEach((resp: any) => {
+        const html_url = resp.html_url;
+        const title = resp.title;
+        console.log(`"${title}": ${html_url}`)
+    });
 }
 
 main(options.user, options.repo);
