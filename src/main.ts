@@ -14,7 +14,10 @@ program.parse(process.argv);
 const options = program.opts();
 
 const main = async (user: string, repo: string) => {
-    const octokit = new Octokit();
+    const pat = process.env.PAT;
+    const octokit = new Octokit({
+        auth: pat
+    });
 
     console.log(`Hello from main --user ${user} --repo ${repo}`);
 
