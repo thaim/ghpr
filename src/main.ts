@@ -19,7 +19,13 @@ const main = async (user: string, repo: string) => {
         auth: pat
     });
 
-    console.log(`Hello from main --user ${user} --repo ${repo}`);
+    repos.split(',').forEach(async (repo: string) => {
+        await describeRepository(octokit, user, repo);
+    })
+}
+
+const describeRepository = async (octokit: any, user: string, repo: string) => {
+    console.log(`describe repository ${user}/${repo}`);
 
     type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
     type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
