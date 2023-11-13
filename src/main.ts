@@ -1,5 +1,6 @@
 const { Command } = require("commander");
-const { Octokit } = require("@octokit/rest");
+import { Octokit } from "@octokit/core"
+import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
 
 const program = new Command();
@@ -14,36 +15,49 @@ program
 program.parse(process.argv);
 const options = program.opts();
 
-const main = async (user: string, repos: string, repoRegexp: string) => {
+const main = async (user: string, repoString: string, repoRegexp: string) => {
     const pat = process.env.PAT;
-    const octokit = new Octokit({
+    const MyOctokit = Octokit.plugin(paginateRest) as (new (...args: any[]) => MyOctokit);
+    const octokit = new MyOctokit({
         auth: pat
     });
 
-    if (repos === undefined && repoRegexp != "") {
-        type listReposiotryParameters = Endpoints["GET /users/{username}/repos"]["parameters"];
-        type listReposiotryResponse = Endpoints["GET /users/{username}/repos"]["response"];
-        const params: listReposiotryParameters = {
-            username: user,
-            type: "all",
-        };
-        const { data } = await octokit.request(
-            "GET /users/{username}/repos",
-            params
-        ) as listReposiotryResponse;
-        const regexp = new RegExp(repoRegexp);
-
-        repos = data
-            .filter((repo: any) => repo.name.match(regexp))
-            .map((repo: any) => repo.name)
-            .join(',');
+    let repos;
+    if (repoString === undefined && repoRegexp != "") {
+        repos = await getAllRepos(octokit, user, repoRegexp);
 
         console.log(`repos: ${repos}`);
+    } else {
+        repos = repoString.split(",");
     }
 
-    repos.split(',').forEach(async (repo: string) => {
+    repos.forEach(async (repo: string) => {
         await describeRepository(octokit, user, repo);
     })
+}
+
+interface MyOctokit extends Octokit {
+    paginate: PaginateInterface;
+}
+
+const getAllRepos = async (octokit: any, user: string, repoRegexp: string) => {
+    type listReposiotryParameters = Endpoints["GET /users/{username}/repos"]["parameters"];
+    type listReposiotryResponse = Endpoints["GET /users/{username}/repos"]["response"];
+    const params: listReposiotryParameters = {
+        username: user,
+        type: "all",
+    };
+
+    const regexp = new RegExp(repoRegexp);
+
+    const repos = await octokit.paginate(
+        "GET /users/{username}/repos",
+        params
+    );
+
+    return repos
+        .filter((repo: any) => repo.name.match(regexp))
+        .map((repo: any) => repo.name);
 }
 
 const describeRepository = async (octokit: any, user: string, repo: string) => {
