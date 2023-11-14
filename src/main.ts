@@ -41,17 +41,15 @@ interface MyOctokit extends Octokit {
 }
 
 const getAllRepos = async (octokit: any, user: string, repoRegexp: string) => {
-    type listReposiotryParameters = Endpoints["GET /users/{username}/repos"]["parameters"];
-    type listReposiotryResponse = Endpoints["GET /users/{username}/repos"]["response"];
+    type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
     const params: listReposiotryParameters = {
-        username: user,
         type: "all",
     };
 
     const regexp = new RegExp(repoRegexp);
 
     const repos = await octokit.paginate(
-        "GET /users/{username}/repos",
+        "GET /user/repos",
         params
     );
 
