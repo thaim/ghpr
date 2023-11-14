@@ -43,7 +43,7 @@ interface MyOctokit extends Octokit {
 const getAllRepos = async (octokit: any, user: string, repoRegexp: string) => {
     type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
     const params: listReposiotryParameters = {
-        type: "all",
+        type: "owner",
     };
 
     const regexp = new RegExp(repoRegexp);
