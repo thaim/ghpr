@@ -31,9 +31,9 @@ const main = async (user: string, repoString: string, repoRegexp: string) => {
         repos = repoString.split(",");
     }
 
-    repos.forEach(async (repo: string) => {
+    for (const repo of repos) {
         await describeRepository(octokit, user, repo);
-    })
+    }
 }
 
 interface MyOctokit extends Octokit {
