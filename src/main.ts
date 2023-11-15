@@ -2,6 +2,7 @@ const { Command } = require("commander");
 import { Octokit } from "@octokit/core"
 import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
+import { readFile } from "fs/promises";
 
 const program = new Command();
 
@@ -78,6 +79,16 @@ const describeRepository = async (octokit: any, user: string, repo: string) => {
         const title = resp.title;
         console.log(`"${title}": ${html_url}`)
     });
+}
+
+const parseJsonFile = async (filePath: string) => {
+    try {
+        const rawData = await readFile(filePath, { encoding: 'utf8' })
+        return JSON.parse(rawData);
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
 }
 
 main(options.user, options.repo, options.repoRegexp, options.config);
