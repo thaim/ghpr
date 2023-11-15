@@ -10,12 +10,13 @@ program
     .version('0.1.0')
     .option('-u, --user <username>')
     .option('-r, --repo <repository name>')
-    .option('--repo-regexp <repository regexp>');
+    .option('--repo-regexp <repository regexp>')
+    .option('-c, --config <config file>');
 
 program.parse(process.argv);
 const options = program.opts();
 
-const main = async (user: string, repoString: string, repoRegexp: string) => {
+const main = async (user: string, repoString: string, repoRegexp: string, configFile: string) => {
     const pat = process.env.PAT;
     const MyOctokit = Octokit.plugin(paginateRest) as (new (...args: any[]) => MyOctokit);
     const octokit = new MyOctokit({
@@ -79,4 +80,4 @@ const describeRepository = async (octokit: any, user: string, repo: string) => {
     });
 }
 
-main(options.user, options.repo, options.repoRegexp);
+main(options.user, options.repo, options.repoRegexp, options.config);
