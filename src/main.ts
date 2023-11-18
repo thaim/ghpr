@@ -86,7 +86,7 @@ const describeRepository = async (octokit: any, user: string, repo: string) => {
     response.data.forEach((resp: any) => {
         const html_url = resp.html_url;
         const title = resp.title;
-        console.log(`"${title}": ${html_url}`)
+        console.log(`  "${title}": ${html_url}`)
     });
 }
 
