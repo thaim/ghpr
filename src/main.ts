@@ -43,8 +43,21 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
         repos = repoString.split(",");
     }
 
-    for (const repo of repos) {
-        await describeRepository(octokit, user, repo);
+    if (config !== undefined) {
+        for (const user of config.users) {
+            if (user.repo !== undefined) {
+                await describeRepository(octokit, user.name, user.repo);
+            } else if (user['repo-regexp'] !== undefined) {
+                repos = await getAllRepos(octokit, user.name, user['repo-regexp']);
+                for (const repo of repos) {
+                    await describeRepository(octokit, user.name, repo);
+                }
+            }
+        }
+    } else {
+        for (const repo of repos) {
+            await describeRepository(octokit, user, repo);
+        }
     }
 }
 
