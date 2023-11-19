@@ -2,7 +2,7 @@ const { Command } = require("commander");
 import { Octokit } from "@octokit/core"
 import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
-import { parseJsonFile } from './utils';
+import { parseJsonFile, GHPRConfig } from './utils';
 
 const program = new Command();
 
@@ -25,14 +25,15 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     });
 
     let repos;
+    let config = {} as GHPRConfig;
     if (configFile !== undefined) {
         console.log(`config file: ${configFile}`);
-        parseJsonFile(configFile).then((parsedData: any) => {
-            let config = parsedData;
+        try {
+            config = await parseJsonFile(configFile);
             console.log(config);
-        }).catch((error: Error) => {
+        } catch (error) {
             console.error(error);
-        });
+        }
         repos = "";
     } else if (repoString === undefined && repoRegexp != "") {
         repos = await getAllRepos(octokit, user, repoRegexp);
