@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/core"
 import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
 
-export interface MyOctokit extends Octokit {
+interface MyOctokit extends Octokit {
     paginate: PaginateInterface;
 }
 
