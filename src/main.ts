@@ -1,8 +1,9 @@
 const { Command } = require("commander");
 import { Octokit } from "@octokit/core"
-import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
-import { Endpoints } from "@octokit/types";
+import { paginateRest } from "@octokit/plugin-paginate-rest";
+
 import { parseJsonFile, GHPRConfig } from './utils';
+import { MyOctokit, GitHubAPI } from './github';
 
 const program = new Command();
 
@@ -23,6 +24,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     const octokit = new MyOctokit({
         auth: pat
     });
+    const github = new GitHubAPI();
 
     let repos;
     let config = {} as GHPRConfig;
@@ -36,7 +38,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
         }
         repos = "";
     } else if (repoString === undefined && repoRegexp != "") {
-        repos = await getAllRepos(octokit, user, repoRegexp);
+        repos = await github.getAllRepos(octokit, user, repoRegexp);
 
         console.log(`repos: ${repos}`);
     } else {
@@ -46,62 +48,19 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     if (config !== undefined) {
         for (const user of config.users) {
             if (user.repo !== undefined) {
-                await describeRepository(octokit, user.name, user.repo);
+                await github.describeRepository(octokit, user.name, user.repo);
             } else if (user['repo-regexp'] !== undefined) {
-                repos = await getAllRepos(octokit, user.name, user['repo-regexp']);
+                repos = await github.getAllRepos(octokit, user.name, user['repo-regexp']);
                 for (const repo of repos) {
-                    await describeRepository(octokit, user.name, repo);
+                    await github.describeRepository(octokit, user.name, repo);
                 }
             }
         }
     } else {
         for (const repo of repos) {
-            await describeRepository(octokit, user, repo);
+            await github.describeRepository(octokit, user, repo);
         }
     }
-}
-
-interface MyOctokit extends Octokit {
-    paginate: PaginateInterface;
-}
-
-const getAllRepos = async (octokit: any, user: string, repoRegexp: string) => {
-    type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
-    const params: listReposiotryParameters = {
-        type: "owner",
-    };
-
-    const regexp = new RegExp(repoRegexp);
-
-    const repos = await octokit.paginate(
-        "GET /user/repos",
-        params
-    );
-
-    return repos
-        .filter((repo: any) => repo.name.match(regexp))
-        .map((repo: any) => repo.name);
-}
-
-const describeRepository = async (octokit: any, user: string, repo: string) => {
-    console.log(`describe repository ${user}/${repo}`);
-
-    type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
-    type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
-    const params: listPullRequestParameters = {
-        owner: user,
-        repo: repo,
-    };
-    const response: listPullRequestResponse = await octokit.request(
-        "GET /repos/{owner}/{repo}/pulls",
-        params
-    );
-
-    response.data.forEach((resp: any) => {
-        const html_url = resp.html_url;
-        const title = resp.title;
-        console.log(`  "${title}": ${html_url}`)
-    });
 }
 
 
