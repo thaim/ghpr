@@ -1,9 +1,7 @@
 const { Command } = require("commander");
-import { Octokit } from "@octokit/core"
-import { paginateRest } from "@octokit/plugin-paginate-rest";
 
 import { parseJsonFile, GHPRConfig } from './utils';
-import { MyOctokit, GitHubAPI } from './github';
+import { GitHubAPI } from './github';
 
 const program = new Command();
 
@@ -19,12 +17,7 @@ program.parse(process.argv);
 const options = program.opts();
 
 const main = async (user: string, repoString: string, repoRegexp: string, configFile: string) => {
-    const pat = process.env.PAT;
-    const MyOctokit = Octokit.plugin(paginateRest) as (new (...args: any[]) => MyOctokit);
-    const octokit = new MyOctokit({
-        auth: pat
-    });
-    const github = new GitHubAPI();
+    const github = new GitHubAPI(process.env.PAT);
 
     let repos;
     let config = {} as GHPRConfig;
@@ -38,7 +31,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
         }
         repos = "";
     } else if (repoString === undefined && repoRegexp != "") {
-        repos = await github.getAllRepos(octokit, user, repoRegexp);
+        repos = await github.getAllRepos(user, repoRegexp);
 
         console.log(`repos: ${repos}`);
     } else {
@@ -48,17 +41,17 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     if (config !== undefined) {
         for (const user of config.users) {
             if (user.repo !== undefined) {
-                await github.describeRepository(octokit, user.name, user.repo);
+                await github.describeRepository(user.name, user.repo);
             } else if (user['repo-regexp'] !== undefined) {
-                repos = await github.getAllRepos(octokit, user.name, user['repo-regexp']);
+                repos = await github.getAllRepos(user.name, user['repo-regexp']);
                 for (const repo of repos) {
-                    await github.describeRepository(octokit, user.name, repo);
+                    await github.describeRepository(user.name, repo);
                 }
             }
         }
     } else {
         for (const repo of repos) {
-            await github.describeRepository(octokit, user, repo);
+            await github.describeRepository(user, repo);
         }
     }
 }

@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/core"
-import { PaginateInterface } from "@octokit/plugin-paginate-rest";
+import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
 
 export interface MyOctokit extends Octokit {
@@ -7,7 +7,16 @@ export interface MyOctokit extends Octokit {
 }
 
 export class GitHubAPI {
-    async getAllRepos(octokit: any, user: string, repoRegexp: string) {
+    private octokit: MyOctokit;
+
+    constructor(pat: string | undefined) {
+        const MyOctokit = Octokit.plugin(paginateRest) as (new (...args: any[]) => MyOctokit);
+        this.octokit = new MyOctokit({
+            auth: pat,
+        });
+    }
+
+    async getAllRepos(user: string, repoRegexp: string) {
         type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
         const params: listReposiotryParameters = {
             type: "owner",
@@ -15,7 +24,7 @@ export class GitHubAPI {
     
         const regexp = new RegExp(repoRegexp);
     
-        const repos = await octokit.paginate(
+        const repos = await this.octokit.paginate(
             "GET /user/repos",
             params
         );
@@ -25,7 +34,7 @@ export class GitHubAPI {
             .map((repo: any) => repo.name);
     }
     
-    async describeRepository(octokit: any, user: string, repo: string) {
+    async describeRepository(user: string, repo: string) {
         console.log(`describe repository ${user}/${repo}`);
     
         type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
@@ -34,7 +43,7 @@ export class GitHubAPI {
             owner: user,
             repo: repo,
         };
-        const response: listPullRequestResponse = await octokit.request(
+        const response: listPullRequestResponse = await this.octokit.request(
             "GET /repos/{owner}/{repo}/pulls",
             params
         );
