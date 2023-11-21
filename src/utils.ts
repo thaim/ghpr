@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 
-export type GHPRConfig = {
+export type GHPRConfigType = {
     users: {
         name: string;
         repo?: string;
@@ -8,11 +8,11 @@ export type GHPRConfig = {
     }[];
 };
 
-export async function parseJsonFile(filePath: string): Promise<GHPRConfig> {
+export async function parseJsonFile(filePath: string): Promise<GHPRConfigType> {
 
     try {
         const rawData = await readFile(filePath, { encoding: 'utf8' });
-        return JSON.parse(rawData) as GHPRConfig;
+        return JSON.parse(rawData) as GHPRConfigType;
     } catch (err) {
         console.error('failed to parse config file: ' + err);
         throw err;

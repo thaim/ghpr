@@ -1,6 +1,6 @@
 const { Command } = require("commander");
 
-import { parseJsonFile, GHPRConfig } from './utils';
+import { parseJsonFile, GHPRConfigType } from './utils';
 import { GitHubAPI } from './github';
 
 const program = new Command();
@@ -20,7 +20,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     const github = new GitHubAPI(process.env.PAT);
 
     let repos;
-    let config = {} as GHPRConfig;
+    let config = {} as GHPRConfigType;
     if (configFile !== undefined) {
         console.log(`config file: ${configFile}`);
         try {
