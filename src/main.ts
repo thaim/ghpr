@@ -20,16 +20,13 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     const github = new GitHubAPI(process.env.PAT);
     const configManager: GHPRConfigManager = new GHPRConfigManager(configFile, user, repoString, repoRegexp);
 
-    for (const user of configManager.getUsers()) {
-        const repo = configManager.getRepo(user)
-        const repoRegexp = configManager.getRepoRegexp(user);
-
-        if (repo !== undefined) {
-            await github.describeRepository(user, repo);
-        } else if (repoRegexp !== undefined) {
-            const repos = await github.getAllRepos(user, repoRegexp);
+    for (const query of configManager.getQueries()) {
+        if (query.repo !== undefined) {
+            await github.describeRepository(query.user, query.repo);
+        } else if (query['repo-regexp'] !== undefined) {
+            const repos = await github.getAllRepos(query.user, query['repo-regexp']);
             for (const repo of repos) {
-                await github.describeRepository(user, repo);
+                await github.describeRepository(query.user, repo);
             }
         }
     }

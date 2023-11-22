@@ -2,8 +2,8 @@ import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
 interface GHPRConfig {
-    users: {
-        name: string;
+    queries: {
+        user: string;
         repo?: string;
         'repo-regexp'?: string;
     }[];
@@ -18,8 +18,8 @@ export class GHPRConfigManager {
             this.config = this.loadConfig(configFile);
         } else if (username !== undefined) {
             this.config = {
-                users: [{
-                    name: username,
+                queries: [{
+                    user: username,
                     repo: repo,
                     "repo-regexp": repoRegexp,
                 }],
@@ -36,25 +36,7 @@ export class GHPRConfigManager {
         return JSON.parse(rawData) as GHPRConfig;
     }
 
-    public getUsers(): string[] {
-        return this.config.users.map((user) => user.name);
-    }
-
-    public getRepo(user: string): string | undefined {
-        const userConfig = this.config.users.find((u) => u.name === user);
-        if (userConfig === undefined) {
-            return undefined;
-        }
-
-        return userConfig.repo;
-    }
-
-    public getRepoRegexp(user: string): string | undefined {
-        const userConfig = this.config.users.find((u) => u.name === user);
-        if (userConfig === undefined) {
-            return undefined;
-        }
-
-        return userConfig['repo-regexp'];
+    public getQueries(): GHPRConfig['queries'] {
+        return this.config.queries;
     }
 }
