@@ -1,6 +1,6 @@
 const { Command } = require("commander");
 
-import { GHPRConfigManager } from './utils';
+import { GHPRConfigManager } from './config';
 import { GitHubAPI } from './github';
 
 const program = new Command();
