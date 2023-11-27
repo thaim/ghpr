@@ -6,6 +6,17 @@ interface MyOctokit extends Octokit {
     paginate: PaginateInterface;
 }
 
+export interface RepositoryPullRequests {
+    repository: {
+        owner: string;
+        repo: string;
+    };
+    pullRequests: {
+        title: string;
+        html_url: string;
+    }[];
+}
+
 export class GitHubAPI {
     private octokit: MyOctokit;
 
@@ -34,8 +45,15 @@ export class GitHubAPI {
             .map((repo: any) => repo.name);
     }
     
-    async describeRepository(user: string, repo: string) {
+    async describeRepository(user: string, repo: string): Promise<RepositoryPullRequests> {
         console.log(`describe repository ${user}/${repo}`);
+        const prs: RepositoryPullRequests = {
+            repository: {
+                owner: user,
+                repo: repo,
+            },
+            pullRequests: [],
+        }
     
         type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
         type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
@@ -48,10 +66,19 @@ export class GitHubAPI {
             params
         );
     
-        response.data.forEach((resp: any) => {
+        const prsResponse = await Promise.all(response.data.map(async (resp: any) => {
             const html_url = resp.html_url;
             const title = resp.title;
             console.log(`  "${title}": ${html_url}`)
-        });
+
+            return {
+                title: title,
+                html_url: html_url,
+            };
+        }));
+
+        prs.pullRequests = prsResponse;
+
+        return prs;
     }    
 }
