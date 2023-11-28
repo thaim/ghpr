@@ -23,6 +23,10 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
     for (const query of configManager.getQueries()) {
         if (query.repo !== undefined) {
             const prs: RepositoryPullRequests = await github.describeRepository(query.user, query.repo);
+            if (prs.pullRequests.length === 0) {
+                continue;
+            }
+
             console.log(`describe repository ${prs.repository.owner}/${prs.repository.repo}`);
             for (const pr of prs.pullRequests) {
                 console.log(`  "${pr.title}": ${pr.html_url}`);
@@ -31,6 +35,10 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
             const repos = await github.getAllRepos(query.user, query['repo-regexp']);
             for (const repo of repos) {
                 const prs: RepositoryPullRequests = await github.describeRepository(query.user, repo);
+                if (prs.pullRequests.length === 0) {
+                    continue;
+                }
+
                 console.log(`describe repository ${prs.repository.owner}/${prs.repository.repo}`);
                 for (const pr of prs.pullRequests) {
                     console.log(`  "${pr.title}": ${pr.html_url}`);
