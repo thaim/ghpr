@@ -1,7 +1,7 @@
 const { Command } = require("commander");
 
 import { GHPRConfigManager } from './config';
-import { GitHubAPI } from './github';
+import { GitHubAPI, RepositoryPullRequests } from './github';
 
 const program = new Command();
 
@@ -22,11 +22,19 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
 
     for (const query of configManager.getQueries()) {
         if (query.repo !== undefined) {
-            await github.describeRepository(query.user, query.repo);
+            const prs: RepositoryPullRequests = await github.describeRepository(query.user, query.repo);
+            console.log(`describe repository ${prs.repository.owner}/${prs.repository.repo}`);
+            for (const pr of prs.pullRequests) {
+                console.log(`  "${pr.title}": ${pr.html_url}`);
+            }
         } else if (query['repo-regexp'] !== undefined) {
             const repos = await github.getAllRepos(query.user, query['repo-regexp']);
             for (const repo of repos) {
-                await github.describeRepository(query.user, repo);
+                const prs: RepositoryPullRequests = await github.describeRepository(query.user, repo);
+                console.log(`describe repository ${prs.repository.owner}/${prs.repository.repo}`);
+                for (const pr of prs.pullRequests) {
+                    console.log(`  "${pr.title}": ${pr.html_url}`);
+                }
             }
         }
     }

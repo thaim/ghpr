@@ -46,7 +46,6 @@ export class GitHubAPI {
     }
     
     async describeRepository(user: string, repo: string): Promise<RepositoryPullRequests> {
-        console.log(`describe repository ${user}/${repo}`);
         const prs: RepositoryPullRequests = {
             repository: {
                 owner: user,
@@ -69,7 +68,6 @@ export class GitHubAPI {
         const prsResponse = await Promise.all(response.data.map(async (resp: any) => {
             const html_url = resp.html_url;
             const title = resp.title;
-            console.log(`  "${title}": ${html_url}`)
 
             return {
                 title: title,
