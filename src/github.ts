@@ -14,6 +14,7 @@ export interface RepositoryPullRequests {
     pullRequests: {
         title: string;
         html_url: string;
+        author: string;
     }[];
 }
 
@@ -72,6 +73,7 @@ export class GitHubAPI {
             return {
                 title: title,
                 html_url: html_url,
+                author: resp.user.login,
             };
         }));
 
