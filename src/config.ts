@@ -1,11 +1,12 @@
 import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
-interface GHPRConfig {
+export interface GHPRConfig {
     queries: {
         user: string;
         repo?: string;
         'repo-regexp'?: string;
+        author?: [string];
     }[];
 }
 

@@ -1,6 +1,7 @@
 import { Octokit } from "@octokit/core"
 import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
+import { GHPRConfigManager, GHPRConfig } from "./config";
 
 interface MyOctokit extends Octokit {
     paginate: PaginateInterface;
@@ -46,7 +47,7 @@ export class GitHubAPI {
             .map((repo: any) => repo.name);
     }
     
-    async describeRepository(user: string, repo: string): Promise<RepositoryPullRequests> {
+    async describeRepository(user: string, repo: string, query: GHPRConfig['queries'][0]): Promise<RepositoryPullRequests> {
         const prs: RepositoryPullRequests = {
             repository: {
                 owner: user,
@@ -70,6 +71,10 @@ export class GitHubAPI {
             const html_url = resp.html_url;
             const title = resp.title;
 
+            if (query.author !== undefined && !query.author.includes(resp.user.login)) {
+                return;
+            }
+
             return {
                 title: title,
                 html_url: html_url,
@@ -77,7 +82,11 @@ export class GitHubAPI {
             };
         }));
 
-        prs.pullRequests = prsResponse;
+        prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as {
+            title: string;
+            html_url: string;
+            author: string;
+        }[];
 
         return prs;
     }    

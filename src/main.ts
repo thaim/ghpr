@@ -22,7 +22,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
 
     for (const query of configManager.getQueries()) {
         if (query.repo !== undefined) {
-            const prs: RepositoryPullRequests = await github.describeRepository(query.user, query.repo);
+            const prs: RepositoryPullRequests = await github.describeRepository(query.user, query.repo, query);
             if (prs.pullRequests.length === 0) {
                 continue;
             }
@@ -34,7 +34,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
         } else if (query['repo-regexp'] !== undefined) {
             const repos = await github.getAllRepos(query.user, query['repo-regexp']);
             for (const repo of repos) {
-                const prs: RepositoryPullRequests = await github.describeRepository(query.user, repo);
+                const prs: RepositoryPullRequests = await github.describeRepository(query.user, repo, query);
                 if (prs.pullRequests.length === 0) {
                     continue;
                 }
