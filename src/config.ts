@@ -7,6 +7,7 @@ export interface GHPRConfig {
         repo?: string;
         'repo-regexp'?: string;
         author?: [string];
+        'author-ignore'?: [string];
     }[];
 }
 

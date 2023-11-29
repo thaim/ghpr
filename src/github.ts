@@ -74,6 +74,9 @@ export class GitHubAPI {
             if (query.author !== undefined && !query.author.includes(resp.user.login)) {
                 return;
             }
+            if (query['author-ignore'] !== undefined && query['author-ignore'].includes(resp.user.login)) {
+                return;
+            }
 
             return {
                 title: title,
