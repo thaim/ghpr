@@ -16,6 +16,7 @@ export interface RepositoryPullRequests {
         title: string;
         html_url: string;
         author: string;
+        draft: boolean;
     }[];
 }
 
@@ -78,10 +79,17 @@ export class GitHubAPI {
                 return;
             }
 
+            if (query['draft'] !== undefined) {
+                if (query['draft'] != resp.draft) {
+                    return;
+                }
+            }
+
             return {
                 title: title,
                 html_url: html_url,
                 author: resp.user.login,
+                draft: resp.draft,
             };
         }));
 
@@ -89,6 +97,7 @@ export class GitHubAPI {
             title: string;
             html_url: string;
             author: string;
+            draft: boolean;
         }[];
 
         return prs;
