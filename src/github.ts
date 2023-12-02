@@ -1,7 +1,7 @@
 import { Octokit } from "@octokit/core"
 import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
-import { GHPRConfigManager, GHPRConfig } from "./config";
+import { GHPRConfig } from "./config";
 
 interface MyOctokit extends Octokit {
     paginate: PaginateInterface;
