@@ -29,8 +29,6 @@ export class GHPRConfigManager {
         } else {
             throw new Error("config file or username must be specified");
         }
-
-        console.log('ConfigManager: ' + JSON.stringify(this.config));
     }
 
     private loadConfig(filePath: string): GHPRConfig {
