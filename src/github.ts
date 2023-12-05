@@ -85,6 +85,20 @@ export class GitHubAPI {
                 }
             }
 
+            if (query['reviewers'] !== undefined) {
+                let includeReviewer = false;
+                resp.requested_reviewers.forEach((reviewer: any) => {
+                    if (query['reviewers']?.includes(reviewer.login)) {
+                        includeReviewer = true;
+                    }
+                })
+
+                if (!includeReviewer) {
+                    return;
+                }
+            }
+
+
             return {
                 title: title,
                 html_url: html_url,
