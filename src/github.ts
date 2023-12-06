@@ -3,6 +3,9 @@ import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
 import { GHPRConfig } from "./config";
 
+type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
+type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
+
 interface MyOctokit extends Octokit {
     paginate: PaginateInterface;
 }
@@ -56,9 +59,7 @@ export class GitHubAPI {
             },
             pullRequests: [],
         }
-    
-        type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
-        type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
+
         const params: listPullRequestParameters = {
             owner: user,
             repo: repo,
