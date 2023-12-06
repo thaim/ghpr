@@ -84,30 +84,28 @@ export class GitHubAPI {
     }
 }
 
-async function filterPullRequests(resp: any, query: GHPRConfig['queries'][0]) {
+async function filterPullRequests(resp: listPullRequestResponse['data'][0], query: GHPRConfig['queries'][0]) {
     const html_url = resp.html_url;
     const title = resp.title;
 
-    if (query.author !== undefined && !query.author.includes(resp.user.login)) {
+    if (resp.user !== null && query.author !== undefined && !query.author?.includes(resp.user.login)) {
         return;
     }
-    if (query['author-ignore'] !== undefined && query['author-ignore'].includes(resp.user.login)) {
+    if (resp.user != null && query['author-ignore'] !== undefined && query['author-ignore']?.includes(resp.user.login)) {
         return;
     }
 
-    if (query['draft'] !== undefined) {
-        if (query['draft'] != resp.draft) {
-            return;
-        }
+    if (query['draft'] !== undefined && query['draft'] !== resp.draft) {
+        return;
     }
 
-    if (query['reviewers'] !== undefined) {
+    if (query['reviewers'] !== undefined && resp.requested_reviewers != null) {
         let includeReviewer = false;
         resp.requested_reviewers.forEach((reviewer: any) => {
             if (query['reviewers']?.includes(reviewer.login)) {
                 includeReviewer = true;
             }
-        })
+        });
 
         if (!includeReviewer) {
             return;
@@ -118,7 +116,7 @@ async function filterPullRequests(resp: any, query: GHPRConfig['queries'][0]) {
     return {
         title: title,
         html_url: html_url,
-        author: resp.user.login,
+        author: resp.user?.login,
         draft: resp.draft,
     };
 }
