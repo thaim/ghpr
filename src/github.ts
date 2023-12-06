@@ -67,44 +67,9 @@ export class GitHubAPI {
             "GET /repos/{owner}/{repo}/pulls",
             params
         );
-    
+
         const prsResponse = await Promise.all(response.data.map(async (resp: any) => {
-            const html_url = resp.html_url;
-            const title = resp.title;
-
-            if (query.author !== undefined && !query.author.includes(resp.user.login)) {
-                return;
-            }
-            if (query['author-ignore'] !== undefined && query['author-ignore'].includes(resp.user.login)) {
-                return;
-            }
-
-            if (query['draft'] !== undefined) {
-                if (query['draft'] != resp.draft) {
-                    return;
-                }
-            }
-
-            if (query['reviewers'] !== undefined) {
-                let includeReviewer = false;
-                resp.requested_reviewers.forEach((reviewer: any) => {
-                    if (query['reviewers']?.includes(reviewer.login)) {
-                        includeReviewer = true;
-                    }
-                })
-
-                if (!includeReviewer) {
-                    return;
-                }
-            }
-
-
-            return {
-                title: title,
-                html_url: html_url,
-                author: resp.user.login,
-                draft: resp.draft,
-            };
+            return filterPullRequests(resp, query);
         }));
 
         prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as {
@@ -115,5 +80,44 @@ export class GitHubAPI {
         }[];
 
         return prs;
-    }    
+    }
+}
+
+async function filterPullRequests(resp: any, query: GHPRConfig['queries'][0]) {
+    const html_url = resp.html_url;
+    const title = resp.title;
+
+    if (query.author !== undefined && !query.author.includes(resp.user.login)) {
+        return;
+    }
+    if (query['author-ignore'] !== undefined && query['author-ignore'].includes(resp.user.login)) {
+        return;
+    }
+
+    if (query['draft'] !== undefined) {
+        if (query['draft'] != resp.draft) {
+            return;
+        }
+    }
+
+    if (query['reviewers'] !== undefined) {
+        let includeReviewer = false;
+        resp.requested_reviewers.forEach((reviewer: any) => {
+            if (query['reviewers']?.includes(reviewer.login)) {
+                includeReviewer = true;
+            }
+        })
+
+        if (!includeReviewer) {
+            return;
+        }
+    }
+
+
+    return {
+        title: title,
+        html_url: html_url,
+        author: resp.user.login,
+        draft: resp.draft,
+    };
 }
