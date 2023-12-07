@@ -73,12 +73,7 @@ export class GitHubAPI {
             return filterPullRequests(resp, query);
         }));
 
-        prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as {
-            title: string;
-            html_url: string;
-            author: string;
-            draft: boolean;
-        }[];
+        prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as RepositoryPullRequests['pullRequests'];
 
         return prs;
     }
