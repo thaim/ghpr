@@ -20,6 +20,7 @@ export interface RepositoryPullRequests {
         html_url: string;
         author: string;
         draft: boolean;
+        updated_at: string;
     }[];
 }
 
@@ -113,5 +114,6 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
         html_url: html_url,
         author: resp.user?.login,
         draft: resp.draft,
+        updated_at: resp.updated_at,
     };
 }
