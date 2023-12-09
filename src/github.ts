@@ -64,6 +64,7 @@ export class GitHubAPI {
         const params: listPullRequestParameters = {
             owner: user,
             repo: repo,
+            sort: "updated",
         };
         const response: listPullRequestResponse = await this.octokit.request(
             "GET /repos/{owner}/{repo}/pulls",
