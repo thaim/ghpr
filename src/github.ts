@@ -92,6 +92,40 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
         return;
     }
 
+    if (query['involves'] !== undefined) {
+        if (resp.user == null || !query['involves']?.includes(resp.user.login)) {
+            return;
+        }
+
+        if (resp.requested_reviewers != null) {
+            let involveReviewer = false;
+            resp.requested_reviewers.forEach((reviewer: any) => {
+                if (query['involves']?.includes(reviewer.login)) {
+                    involveReviewer = true;
+                }
+            });
+
+            if (!involveReviewer) {
+                return;
+            }
+        }
+
+        if (resp.assignees != null) {
+            let involveAssignee = false;
+            resp.assignees.forEach((assignee: any) => {
+                if (query['involves']?.includes(assignee.login)) {
+                    involveAssignee = true;
+                }
+            });
+
+            if (!involveAssignee) {
+                return;
+            }
+        }
+
+        // TODO: comments and mentions
+    }
+
     if (query['draft'] !== undefined && query['draft'] !== resp.draft) {
         return;
     }

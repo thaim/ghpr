@@ -9,6 +9,7 @@ export interface GHPRConfig {
         'author-ignore'?: [string];
         'draft'?: boolean;
         'reviewers'?: [string];
+        'involves'?: [string];
     }[];
 }
 
