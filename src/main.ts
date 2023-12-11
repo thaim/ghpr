@@ -11,12 +11,13 @@ program
     .option('-u, --user <username>')
     .option('-r, --repo <repository name>')
     .option('--repo-regexp <repository regexp>')
-    .option('-c, --config <config file>');
+    .option('-c, --config <config file>')
+    .option('-f --format <format>', 'text');
 
 program.parse(process.argv);
 const options = program.opts();
 
-const main = async (user: string, repoString: string, repoRegexp: string, configFile: string) => {
+const main = async (user: string, repoString: string, repoRegexp: string, configFile: string, format: string) => {
     const github = new GitHubAPI(process.env.PAT);
     const configManager: GHPRConfigManager = new GHPRConfigManager(configFile, user, repoString, repoRegexp);
 
@@ -27,7 +28,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
                 continue;
             }
 
-            printRepo(query.user, query.repo, prs);
+            printRepo(query.user, query.repo, prs, format);
         } else if (query['repo-regexp'] !== undefined) {
             const repos = await github.getAllRepos(query.user, query['repo-regexp']);
             for (const repo of repos) {
@@ -36,18 +37,26 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
                     continue;
                 }
 
-                printRepo(query.user, repo, prs);
+                printRepo(query.user, repo, prs, format);
             }
         }
     }
 }
 
-function printRepo(user: string, repository: string, prs: RepositoryPullRequests) {
-    console.log(`describe repository ${user}/${repository}`);
-    for (const pr of prs.pullRequests) {
-        console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at}))`);
+function printRepo(user: string, repository: string, prs: RepositoryPullRequests, format: string) {
+    switch(format) {
+        case 'json':
+            console.log(JSON.stringify(prs));
+            break;
+        case 'text':
+        default:
+            console.log(`describe repository ${user}/${repository}`);
+            for (const pr of prs.pullRequests) {
+                console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at}))`);
+            }
+            break;
     }
 }
 
 
-main(options.user, options.repo, options.repoRegexp, options.config);
+main(options.user, options.repo, options.repoRegexp, options.config, options.format);
