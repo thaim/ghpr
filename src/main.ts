@@ -27,10 +27,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
                 continue;
             }
 
-            console.log(`describe repository ${prs.repository.owner}/${prs.repository.repo}`);
-            for (const pr of prs.pullRequests) {
-                console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at}))`);
-            }
+            printRepo(query.user, query.repo, prs);
         } else if (query['repo-regexp'] !== undefined) {
             const repos = await github.getAllRepos(query.user, query['repo-regexp']);
             for (const repo of repos) {
@@ -39,12 +36,16 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
                     continue;
                 }
 
-                console.log(`describe repository ${prs.repository.owner}/${prs.repository.repo}`);
-                for (const pr of prs.pullRequests) {
-                    console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at}))`);
-                }
+                printRepo(query.user, repo, prs);
             }
         }
+    }
+}
+
+function printRepo(user: string, repository: string, prs: RepositoryPullRequests) {
+    console.log(`describe repository ${user}/${repository}`);
+    for (const pr of prs.pullRequests) {
+        console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at}))`);
     }
 }
 
