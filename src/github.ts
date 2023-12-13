@@ -74,7 +74,8 @@ export class GitHubAPI {
         );
 
         const prsResponse = await Promise.all(response.data.map(async (resp: any) => {
-            return filterPullRequests(resp, query);
+            const comments = await this.listReviewComments(user, repo, resp.number);
+            return filterPullRequests(resp, query, comments);
         }));
 
         prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as RepositoryPullRequests['pullRequests'];
@@ -97,7 +98,7 @@ export class GitHubAPI {
     }
 }
 
-async function filterPullRequests(resp: listPullRequestResponse['data'][0], query: GHPRConfig['queries'][0]) {
+async function filterPullRequests(resp: listPullRequestResponse['data'][0], query: GHPRConfig['queries'][0], comments: listReviewCommentsResponse['data']) {
     const html_url = resp.html_url;
     const title = resp.title;
 
