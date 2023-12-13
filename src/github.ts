@@ -5,6 +5,8 @@ import { GHPRConfig } from "./config";
 
 type listPullRequestParameters = Endpoints["GET /repos/{owner}/{repo}/pulls"]["parameters"];
 type listPullRequestResponse = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"];
+type listReviewCommentsParameters = Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"]["parameters"];
+type listReviewCommentsResponse = Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"]["response"];
 
 interface MyOctokit extends Octokit {
     paginate: PaginateInterface;
@@ -78,6 +80,20 @@ export class GitHubAPI {
         prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as RepositoryPullRequests['pullRequests'];
 
         return prs;
+    }
+
+    async listReviewComments(user: string, repo: string, prNumber: number): Promise<listReviewCommentsResponse['data']> {
+        const params: listReviewCommentsParameters = {
+            owner: user,
+            repo: repo,
+            pull_number: prNumber,
+        };
+        const response: listReviewCommentsResponse = await this.octokit.request(
+            "GET /repos/{owner}/{repo}/pulls/{pull_number}/comments",
+            params
+        );
+
+        return response.data;
     }
 }
 
