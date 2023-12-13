@@ -155,6 +155,12 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
             }
         });
 
+        comments.forEach((comment: any) => {
+            if (query['reviewers']?.includes(comment.user.login)) {
+                includeReviewer = true;
+            }
+        });
+
         if (!includeReviewer) {
             return;
         }
