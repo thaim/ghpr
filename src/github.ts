@@ -110,37 +110,41 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
     }
 
     if (query['involves'] !== undefined) {
-        if (resp.user == null || !query['involves']?.includes(resp.user.login)) {
-            return;
+        let involved = false
+
+        if (resp.user != null && query['involves']?.includes(resp.user.login)) {
+            involved = true;
         }
 
-        if (resp.requested_reviewers != null) {
-            let involveReviewer = false;
+        if (!involved && resp.requested_reviewers != null) {
             resp.requested_reviewers.forEach((reviewer: any) => {
                 if (query['involves']?.includes(reviewer.login)) {
-                    involveReviewer = true;
+                    involved = true;
                 }
             });
-
-            if (!involveReviewer) {
-                return;
-            }
         }
 
-        if (resp.assignees != null) {
-            let involveAssignee = false;
+        if (!involved && resp.assignees != null) {
             resp.assignees.forEach((assignee: any) => {
                 if (query['involves']?.includes(assignee.login)) {
-                    involveAssignee = true;
+                    involved = true;
                 }
             });
-
-            if (!involveAssignee) {
-                return;
-            }
         }
 
-        // TODO: comments and mentions
+        if (!involved && comments != null) {
+            comments.forEach((comment: any) => {
+                if (query['involves']?.includes(comment.user.login)) {
+                    involved = true;
+                }
+            });
+        }
+
+        // TODO: mentions
+
+        if (!involved) {
+            return;
+        }
     }
 
     if (query['draft'] !== undefined && query['draft'] !== resp.draft) {
