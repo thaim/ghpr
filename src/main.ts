@@ -1,18 +1,18 @@
 const { Command } = require("commander");
 
-import { GHPRConfigManager } from './config';
-import { GitHubAPI, RepositoryPullRequests } from './github';
+import { GHPRConfigManager } from "./config";
+import { GitHubAPI, RepositoryPullRequests } from "./github";
 
 const program = new Command();
 
 program
-    .name('ghpr')
-    .version('0.1.0')
-    .option('-u, --user <username>')
-    .option('-r, --repo <repository name>')
-    .option('--repo-regexp <repository regexp>')
-    .option('-c, --config <config file>')
-    .option('-f --format <format>', 'text');
+    .name("ghpr")
+    .version("0.1.0")
+    .option("-u, --user <username>")
+    .option("-r, --repo <repository name>")
+    .option("--repo-regexp <repository regexp>")
+    .option("-c, --config <config file>")
+    .option("-f --format <format>", "text");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -29,8 +29,8 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
             }
 
             printRepo(query.user, query.repo, prs, format);
-        } else if (query['repo-regexp'] !== undefined) {
-            const repos = await github.getAllRepos(query.user, query['repo-regexp']);
+        } else if (query["repo-regexp"] !== undefined) {
+            const repos = await github.getAllRepos(query.user, query["repo-regexp"]);
             for (const repo of repos) {
                 const prs: RepositoryPullRequests = await github.describeRepository(query.user, repo, query);
                 if (prs.pullRequests.length === 0) {
@@ -41,14 +41,14 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
             }
         }
     }
-}
+};
 
 function printRepo(user: string, repository: string, prs: RepositoryPullRequests, format: string) {
-    switch(format) {
-        case 'json':
+    switch (format) {
+        case "json":
             console.log(JSON.stringify(prs));
             break;
-        case 'text':
+        case "text":
         default:
             console.log(`${user}/${repository}`);
             for (const pr of prs.pullRequests) {
@@ -57,6 +57,5 @@ function printRepo(user: string, repository: string, prs: RepositoryPullRequests
             break;
     }
 }
-
 
 main(options.user, options.repo, options.repoRegexp, options.config, options.format);

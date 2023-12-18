@@ -1,4 +1,4 @@
-import { Octokit } from "@octokit/core"
+import { Octokit } from "@octokit/core";
 import { paginateRest, PaginateInterface } from "@octokit/plugin-paginate-rest";
 import { Endpoints } from "@octokit/types";
 import { GHPRConfig } from "./config";
@@ -30,7 +30,7 @@ export class GitHubAPI {
     private octokit: MyOctokit;
 
     constructor(pat: string | undefined) {
-        const MyOctokit = Octokit.plugin(paginateRest) as (new (...args: any[]) => MyOctokit);
+        const MyOctokit = Octokit.plugin(paginateRest) as new (...args: any[]) => MyOctokit;
         this.octokit = new MyOctokit({
             auth: pat,
         });
@@ -41,49 +41,51 @@ export class GitHubAPI {
         const params: listReposiotryParameters = {
             type: "owner",
         };
-    
+
         const regexp = new RegExp(repoRegexp);
-    
-        const repos = await this.octokit.paginate(
-            "GET /user/repos",
-            params
-        );
-    
-        return repos
-            .filter((repo: any) => repo.name.match(regexp))
-            .map((repo: any) => repo.name);
+
+        const repos = await this.octokit.paginate("GET /user/repos", params);
+
+        return repos.filter((repo: any) => repo.name.match(regexp)).map((repo: any) => repo.name);
     }
-    
-    async describeRepository(user: string, repo: string, query: GHPRConfig['queries'][0]): Promise<RepositoryPullRequests> {
+
+    async describeRepository(
+        user: string,
+        repo: string,
+        query: GHPRConfig["queries"][0],
+    ): Promise<RepositoryPullRequests> {
         const prs: RepositoryPullRequests = {
             repository: {
                 owner: user,
                 repo: repo,
             },
             pullRequests: [],
-        }
+        };
 
         const params: listPullRequestParameters = {
             owner: user,
             repo: repo,
             sort: "updated",
         };
-        const response: listPullRequestResponse = await this.octokit.request(
-            "GET /repos/{owner}/{repo}/pulls",
-            params
+        const response: listPullRequestResponse = await this.octokit.request("GET /repos/{owner}/{repo}/pulls", params);
+
+        const prsResponse = await Promise.all(
+            response.data.map(async (resp: any) => {
+                const comments = await this.listReviewComments(user, repo, resp.number);
+                return filterPullRequests(resp, query, comments);
+            }),
         );
 
-        const prsResponse = await Promise.all(response.data.map(async (resp: any) => {
-            const comments = await this.listReviewComments(user, repo, resp.number);
-            return filterPullRequests(resp, query, comments);
-        }));
-
-        prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as RepositoryPullRequests['pullRequests'];
+        prs.pullRequests = prsResponse.filter((pr: any) => pr !== undefined) as RepositoryPullRequests["pullRequests"];
 
         return prs;
     }
 
-    async listReviewComments(user: string, repo: string, prNumber: number): Promise<listReviewCommentsResponse['data']> {
+    async listReviewComments(
+        user: string,
+        repo: string,
+        prNumber: number,
+    ): Promise<listReviewCommentsResponse["data"]> {
         const params: listReviewCommentsParameters = {
             owner: user,
             repo: repo,
@@ -91,34 +93,42 @@ export class GitHubAPI {
         };
         const response: listReviewCommentsResponse = await this.octokit.request(
             "GET /repos/{owner}/{repo}/pulls/{pull_number}/comments",
-            params
+            params,
         );
 
         return response.data;
     }
 }
 
-async function filterPullRequests(resp: listPullRequestResponse['data'][0], query: GHPRConfig['queries'][0], comments: listReviewCommentsResponse['data']) {
+async function filterPullRequests(
+    resp: listPullRequestResponse["data"][0],
+    query: GHPRConfig["queries"][0],
+    comments: listReviewCommentsResponse["data"],
+) {
     const html_url = resp.html_url;
     const title = resp.title;
 
     if (resp.user !== null && query.author !== undefined && !query.author?.includes(resp.user.login)) {
         return;
     }
-    if (resp.user != null && query['author-ignore'] !== undefined && query['author-ignore']?.includes(resp.user.login)) {
+    if (
+        resp.user != null &&
+        query["author-ignore"] !== undefined &&
+        query["author-ignore"]?.includes(resp.user.login)
+    ) {
         return;
     }
 
-    if (query['involves'] !== undefined) {
-        let involved = false
+    if (query["involves"] !== undefined) {
+        let involved = false;
 
-        if (resp.user != null && query['involves']?.includes(resp.user.login)) {
+        if (resp.user != null && query["involves"]?.includes(resp.user.login)) {
             involved = true;
         }
 
         if (!involved && resp.requested_reviewers != null) {
             resp.requested_reviewers.forEach((reviewer: any) => {
-                if (query['involves']?.includes(reviewer.login)) {
+                if (query["involves"]?.includes(reviewer.login)) {
                     involved = true;
                 }
             });
@@ -126,7 +136,7 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
 
         if (!involved && resp.assignees != null) {
             resp.assignees.forEach((assignee: any) => {
-                if (query['involves']?.includes(assignee.login)) {
+                if (query["involves"]?.includes(assignee.login)) {
                     involved = true;
                 }
             });
@@ -134,7 +144,7 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
 
         if (!involved && comments != null) {
             comments.forEach((comment: any) => {
-                if (query['involves']?.includes(comment.user.login)) {
+                if (query["involves"]?.includes(comment.user.login)) {
                     involved = true;
                 }
             });
@@ -147,20 +157,20 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
         }
     }
 
-    if (query['draft'] !== undefined && query['draft'] !== resp.draft) {
+    if (query["draft"] !== undefined && query["draft"] !== resp.draft) {
         return;
     }
 
-    if (query['reviewers'] !== undefined && resp.requested_reviewers != null) {
+    if (query["reviewers"] !== undefined && resp.requested_reviewers != null) {
         let includeReviewer = false;
         resp.requested_reviewers.forEach((reviewer: any) => {
-            if (query['reviewers']?.includes(reviewer.login)) {
+            if (query["reviewers"]?.includes(reviewer.login)) {
                 includeReviewer = true;
             }
         });
 
         comments.forEach((comment: any) => {
-            if (query['reviewers']?.includes(comment.user.login)) {
+            if (query["reviewers"]?.includes(comment.user.login)) {
                 includeReviewer = true;
             }
         });
@@ -169,7 +179,6 @@ async function filterPullRequests(resp: listPullRequestResponse['data'][0], quer
             return;
         }
     }
-
 
     return {
         title: title,

@@ -10,6 +10,9 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - run: yarn install --frozen-lockfile
+      - name: run prettier
+        run: yarn run prettier --check src/
       - uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
