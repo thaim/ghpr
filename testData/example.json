@@ -1,0 +1,16 @@
+{
+  "queries": [
+    {
+      "user": "user1",
+      "repo": "ghpr"
+    },
+    {
+      "user": "user1",
+      "repo": "another-repository"
+    },
+    {
+      "user": "user1",
+      "repo-regexp": "awesome-plugin-"
+    }
+  ]
+}
