@@ -38,23 +38,24 @@ export class GitHubAPI {
 
     async getAllRepos(user: string, repoRegexp: string, forked?: boolean) {
         type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
+        type listReposiotryResponse = Endpoints["GET /user/repos"]["response"]["data"];
         const params: listReposiotryParameters = {
             type: "owner",
         };
 
         const regexp = new RegExp(repoRegexp);
 
-        const repos = await this.octokit.paginate("GET /user/repos", params);
+        const repos: listReposiotryResponse = await this.octokit.paginate("GET /user/repos", params);
 
         return repos
-            .filter((repo: any) => repo.name.match(regexp))
-            .filter((repo: any) => {
+            .filter((repo: listReposiotryResponse[0]) => repo.name.match(regexp))
+            .filter((repo: listReposiotryResponse[0]) => {
                 if (forked !== undefined && forked != repo.fork) {
                     return false;
                 }
                 return true;
             })
-            .map((repo: any) => repo.name);
+            .map((repo: listReposiotryResponse[0]) => repo.name);
     }
 
     async describeRepository(
