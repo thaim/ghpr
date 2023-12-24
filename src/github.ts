@@ -46,12 +46,15 @@ export class GitHubAPI {
 
         const repos = await this.octokit.paginate("GET /user/repos", params);
 
-        return repos.filter((repo: any) => repo.name.match(regexp)).filter((repo: any) => {
-            if (forked !== undefined && forked != repo.fork) {
-                return false;
-            }
-            return true;
-        }).map((repo: any) => repo.name);
+        return repos
+            .filter((repo: any) => repo.name.match(regexp))
+            .filter((repo: any) => {
+                if (forked !== undefined && forked != repo.fork) {
+                    return false;
+                }
+                return true;
+            })
+            .map((repo: any) => repo.name);
     }
 
     async describeRepository(
