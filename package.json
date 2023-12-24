@@ -1,5 +1,5 @@
 {
-  "name": "ghpr",
+  "name": "@thaim/ghpr",
   "version": "0.2.0",
   "description": "Describe Pull Requests",
   "main": "index.js",
