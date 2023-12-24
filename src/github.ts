@@ -36,7 +36,7 @@ export class GitHubAPI {
         });
     }
 
-    async getAllRepos(user: string, repoRegexp: string, forked?: boolean) {
+    async getAllRepos(user: string, repoRegexp: string, forked?: boolean): Promise<string[]> {
         type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
         type listReposiotryResponse = Endpoints["GET /user/repos"]["response"]["data"];
         const params: listReposiotryParameters = {
