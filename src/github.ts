@@ -36,7 +36,7 @@ export class GitHubAPI {
         });
     }
 
-    async getAllRepos(user: string, repoRegexp: string) {
+    async getAllRepos(user: string, repoRegexp: string, forked?: boolean) {
         type listReposiotryParameters = Endpoints["GET /user/repos"]["parameters"];
         const params: listReposiotryParameters = {
             type: "owner",
@@ -46,7 +46,15 @@ export class GitHubAPI {
 
         const repos = await this.octokit.paginate("GET /user/repos", params);
 
-        return repos.filter((repo: any) => repo.name.match(regexp)).map((repo: any) => repo.name);
+        return repos
+            .filter((repo: any) => repo.name.match(regexp))
+            .filter((repo: any) => {
+                if (forked !== undefined && forked != repo.fork) {
+                    return false;
+                }
+                return true;
+            })
+            .map((repo: any) => repo.name);
     }
 
     async describeRepository(

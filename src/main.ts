@@ -30,7 +30,7 @@ const main = async (user: string, repoString: string, repoRegexp: string, config
 
             printRepo(query.user, query.repo, prs, format);
         } else if (query["repo-regexp"] !== undefined) {
-            const repos = await github.getAllRepos(query.user, query["repo-regexp"]);
+            const repos = await github.getAllRepos(query.user, query["repo-regexp"], query.forked);
             for (const repo of repos) {
                 const prs: RepositoryPullRequests = await github.describeRepository(query.user, repo, query);
                 if (prs.pullRequests.length === 0) {

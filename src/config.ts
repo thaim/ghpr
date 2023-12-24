@@ -5,6 +5,7 @@ export interface GHPRConfig {
         user: string;
         repo?: string;
         "repo-regexp"?: string;
+        forked?: boolean;
         author?: [string];
         "author-ignore"?: [string];
         draft?: boolean;
