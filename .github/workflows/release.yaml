@@ -1,0 +1,19 @@
+name: release
+
+on: push
+  branches:
+    - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: yarn install --frozen-lockfile
+      - run: yarn tsc --build
+      - run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
