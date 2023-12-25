@@ -1,0 +1,17 @@
+# common
+*~
+.env
+
+# 
+/src
+/testData
+
+# config
+jest.config.js
+tsconfig.json
+.eslintrc.js
+
+# generated files
+/node_modules
+/yarn-error.log
+

@@ -1,8 +1,7 @@
 {
-  "name": "ghpr",
-  "version": "0.1.0",
+  "name": "@thaim/ghpr",
+  "version": "0.2.0",
   "description": "Describe Pull Requests",
-  "private": true,
   "main": "index.js",
   "repository": "ssh://git@github.com/thaim/ghpr.git",
   "author": "thaim <thaim24@gmail.com>",
