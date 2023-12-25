@@ -6,6 +6,10 @@
   "repository": "ssh://git@github.com/thaim/ghpr.git",
   "author": "thaim <thaim24@gmail.com>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "prettier": {
     "tabWidth": 4,
     "printWidth": 120
