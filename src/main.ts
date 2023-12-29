@@ -52,7 +52,7 @@ function printRepo(user: string, repository: string, prs: RepositoryPullRequests
         default:
             console.log(`${user}/${repository}`);
             for (const pr of prs.pullRequests) {
-                console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at}))`);
+                console.log(`  "${pr.title}": ${pr.html_url} by ${pr.author} (${pr.updated_at})`);
             }
             break;
     }
