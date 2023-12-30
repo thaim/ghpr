@@ -10,6 +10,7 @@
 jest.config.js
 tsconfig.json
 .eslintrc.js
+.github
 
 # generated files
 /node_modules
