@@ -11,13 +11,16 @@ export interface GHPRConfig {
         draft?: boolean;
         reviewers?: [string];
         involves?: [string];
+        since?: string;
     }[];
 }
 
 export class GHPRConfigManager {
     private config: GHPRConfig;
+    private since?: string;
 
-    constructor(configFile?: string, username?: string, repo?: string, repoRegexp?: string) {
+    constructor(configFile?: string, username?: string, repo?: string, repoRegexp?: string, since?: string) {
+        this.since = since;
         if (configFile !== undefined) {
             this.config = this.loadConfig(configFile);
         } else if (username !== undefined) {
@@ -41,6 +44,12 @@ export class GHPRConfigManager {
     }
 
     public getQueries(): GHPRConfig["queries"] {
+        this.config.queries.forEach((query) => {
+            if (query.since === undefined) {
+                query.since = this.since;
+            }
+        });
+
         return this.config.queries;
     }
 }

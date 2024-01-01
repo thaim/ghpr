@@ -189,6 +189,15 @@ async function filterPullRequests(
         }
     }
 
+    if (query["since"] !== undefined) {
+        const sinceDate = new Date(query["since"]);
+        const updatedAt = new Date(resp.updated_at);
+
+        if (updatedAt < sinceDate) {
+            return;
+        }
+    }
+
     return {
         title: title,
         html_url: html_url,
