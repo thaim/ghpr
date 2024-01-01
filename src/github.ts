@@ -190,8 +190,8 @@ async function filterPullRequests(
     }
 
     if (query["since"] !== undefined) {
-        let sinceDate = new Date(query["since"]);
-        let updatedAt = new Date(resp.updated_at);
+        const sinceDate = new Date(query["since"]);
+        const updatedAt = new Date(resp.updated_at);
 
         if (updatedAt < sinceDate) {
             return;
