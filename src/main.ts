@@ -12,14 +12,28 @@ program
     .option("-r, --repo <repository name>")
     .option("--repo-regexp <repository regexp>")
     .option("-c, --config <config file>")
-    .option("-f --format <format>", "text");
+    .option("-f --format <format>", "text")
+    .option("-s --since <date>", "date");
 
 program.parse(process.argv);
 const options = program.opts();
 
-const main = async (user: string, repoString: string, repoRegexp: string, configFile: string, format: string) => {
+const main = async (
+    user: string,
+    repoString: string,
+    repoRegexp: string,
+    configFile: string,
+    format: string,
+    defaultSince: string,
+) => {
     const github = new GitHubAPI(process.env.PAT);
-    const configManager: GHPRConfigManager = new GHPRConfigManager(configFile, user, repoString, repoRegexp);
+    const configManager: GHPRConfigManager = new GHPRConfigManager(
+        configFile,
+        user,
+        repoString,
+        repoRegexp,
+        defaultSince,
+    );
 
     for (const query of configManager.getQueries()) {
         if (query.repo !== undefined) {
@@ -58,4 +72,4 @@ function printRepo(user: string, repository: string, prs: RepositoryPullRequests
     }
 }
 
-main(options.user, options.repo, options.repoRegexp, options.config, options.format);
+main(options.user, options.repo, options.repoRegexp, options.config, options.format, options.since);
