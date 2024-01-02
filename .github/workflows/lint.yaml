@@ -18,3 +18,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           eslint_flags: "src/"
+
+  unittest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - run: yarn install --frozen-lockfile
+      - run: yarn run jest
