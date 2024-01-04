@@ -211,6 +211,19 @@ async function filterPullRequests(
         }
     }
 
+    if (query["label-ignore"] !== undefined) {
+        let includeLabel = false;
+        resp.labels.forEach((label: any) => {
+            if (query["label-ignore"]?.includes(label.name)) {
+                includeLabel = true;
+            }
+        });
+
+        if (includeLabel) {
+            return;
+        }
+    }
+
     return {
         title: title,
         html_url: html_url,

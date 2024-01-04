@@ -13,6 +13,7 @@ export interface GHPRConfig {
         involves?: [string];
         since?: string;
         label?: [string];
+        "label-ignore"?: [string];
     }[];
 }
 
