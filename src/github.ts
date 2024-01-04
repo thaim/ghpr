@@ -200,7 +200,7 @@ async function filterPullRequests(
 
     if (query["label"] !== undefined) {
         let includeLabel = false;
-        resp.labels.forEach((label: any) => {
+        resp.labels.forEach((label: listPullRequestResponse["data"][0]["labels"][0]) => {
             if (query["label"]?.includes(label.name)) {
                 includeLabel = true;
             }
@@ -213,7 +213,7 @@ async function filterPullRequests(
 
     if (query["label-ignore"] !== undefined) {
         let includeLabel = false;
-        resp.labels.forEach((label: any) => {
+        resp.labels.forEach((label: listPullRequestResponse["data"][0]["labels"][0]) => {
             if (query["label-ignore"]?.includes(label.name)) {
                 includeLabel = true;
             }
