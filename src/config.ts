@@ -12,6 +12,8 @@ export interface GHPRConfig {
         reviewers?: [string];
         involves?: [string];
         since?: string;
+        label?: [string];
+        "label-ignore"?: [string];
     }[];
 }
 
