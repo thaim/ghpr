@@ -3,6 +3,7 @@
   "version": "0.2.2",
   "description": "Describe Pull Requests",
   "main": "index.js",
+  "bin": "dist/cli.js",
   "repository": "ssh://git@github.com/thaim/ghpr.git",
   "author": "thaim <thaim24@gmail.com>",
   "license": "MIT",
