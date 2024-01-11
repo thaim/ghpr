@@ -1,5 +1,5 @@
 import { GHPR } from "./ghpr";
 import { GitHubAPI } from "./github";
-import { GHPRConfig } from "./config";
+import { GHPRConfig, GHPRConfigManager } from "./config";
 
-export { GHPR, GitHubAPI, GHPRConfig };
+export { GHPR, GitHubAPI, GHPRConfig, GHPRConfigManager };
