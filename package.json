@@ -1,6 +1,6 @@
 {
   "name": "@thaim/ghpr",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Describe Pull Requests",
   "main": "dist/main.js",
   "bin": "dist/cli.js",
